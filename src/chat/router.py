@@ -56,7 +56,7 @@ async def get_available_models():
     return {
         "models": model_settings.available_models,
         "default_models": {
-            "openai": model_settings.OPENAI_DEFAULT_MODEL,
-            "anthropic": model_settings.ANTHROPIC_DEFAULT_MODEL
+            "openai": next(iter(model_settings.OPENAI_MODELS), None),  # 첫 번째 OpenAI 모델을 기본값으로
+            "anthropic": next(iter(model_settings.ANTHROPIC_MODELS), None)  # 첫 번째 Anthropic 모델을 기본값으로
         }
     }

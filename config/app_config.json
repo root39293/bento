@@ -5,6 +5,10 @@
         "environment": "development"
     },
     "models": {
+        "default_models": {
+            "openai": "gpt-4o",
+            "anthropic": "claude-3-5-sonnet-20241022"
+        },
         "openai": {
             "gpt-4o": {
                 "name": "GPT-4",
