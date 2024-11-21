@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
 from typing import Dict
+
+from fastapi.responses import StreamingResponse
 from .models import ChatRequest, ChatResponse
 from .service import ChatService
 from anthropic import AsyncAnthropic
@@ -8,7 +9,7 @@ from pydantic import BaseModel
 from src.core.config import settings, model_settings
 
 class APIKeyRequest(BaseModel):
-    api_type: str  # 'openai' 또는 'anthropic'
+    api_type: str 
     api_key: str
 
 router = APIRouter()

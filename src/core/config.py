@@ -29,10 +29,23 @@ class Settings(BaseSettings):
 class ModelSettings(BaseSettings):
     """AI 모델 관련 설정"""
     _models_config = app_config_json.get('models', {})
+    _rag_config = app_config_json.get('rag', {})
     
     # 모델 설정
     OPENAI_MODELS: Dict = _models_config.get('openai', {})
     ANTHROPIC_MODELS: Dict = _models_config.get('anthropic', {})
+    
+    # RAG 설정
+    RAG_CHUNK_SIZE: int = _rag_config.get('chunk_size', 1000)
+    RAG_CHUNK_OVERLAP: int = _rag_config.get('chunk_overlap', 200)
+    RAG_EMBEDDING_MODEL: str = _rag_config.get('embedding_model', 'text-embedding-3-small')
+    RAG_TOP_K: int = _rag_config.get('top_k', 3)
+    RAG_PERSIST_DIRECTORY: str = _rag_config.get('persist_directory', 'data/chroma')
+    RAG_SIMILARITY_THRESHOLD: float = _rag_config.get('similarity_threshold', 0.7)
+    RAG_SYSTEM_PROMPT_TEMPLATE: str = _rag_config.get(
+        'system_prompt_template', 
+        "다음 문서들을 참고하여 답변해주세요:\n\n{context}"
+    )
     
     @property
     def available_models(self) -> Dict[str, str]:
@@ -57,6 +70,19 @@ class ModelSettings(BaseSettings):
     
     def is_anthropic_model(self, model_name: str) -> bool:
         return model_name in self.ANTHROPIC_MODELS
+    
+    @property
+    def rag_config(self) -> Dict:
+        """RAG 설정 반환"""
+        return {
+            "chunk_size": self.RAG_CHUNK_SIZE,
+            "chunk_overlap": self.RAG_CHUNK_OVERLAP,
+            "embedding_model": self.RAG_EMBEDDING_MODEL,
+            "top_k": self.RAG_TOP_K,
+            "persist_directory": self.RAG_PERSIST_DIRECTORY,
+            "similarity_threshold": self.RAG_SIMILARITY_THRESHOLD,
+            "system_prompt_template": self.RAG_SYSTEM_PROMPT_TEMPLATE
+        }
 
 @lru_cache()
 def get_settings() -> Settings:

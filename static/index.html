@@ -37,6 +37,10 @@
                 <input type="checkbox" id="context-enabled">
                 컨텍스트 활성화
             </label>
+            <label style="margin-left: 10px;">
+                <input type="checkbox" id="rag-enabled">
+                RAG 활성화
+            </label>
         </div>
     </div>
 
@@ -47,6 +51,14 @@
             <button onclick="sendMessage()">전송</button>
             <button onclick="newChat()">새 대화</button>
             <button onclick="clearChat()">대화 지우기</button>
+        </div>
+    </div>
+
+    <div class="document-management">
+        <h3>문서 관리</h3>
+        <div>
+            <input type="file" id="document-upload" accept=".pdf,.docx,.txt" />
+            <button onclick="uploadDocument()">문서 업로드</button>
         </div>
     </div>
 
@@ -90,6 +102,7 @@
                         question: message,
                         model: document.getElementById('model-select').value,
                         context_enabled: document.getElementById('context-enabled').checked,
+                        rag_enabled: document.getElementById('rag-enabled').checked,
                         conversation_id: conversationId
                     })
                 });
@@ -136,6 +149,42 @@
                 sendMessage();
             }
         });
+
+        async function uploadDocument() {
+            const fileInput = document.getElementById('document-upload');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('파일을 선택해주세요.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                console.log('파일 업로드 시도:', file.name);
+                console.log('파일 타입:', file.type);
+                
+                const response = await fetch('/api/v1/documents/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('응답 상태:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('응답 데이터:', data);
+                alert(data.message);
+            } catch (error) {
+                console.error('업로드 오류:', error);
+                alert('문서 업로드 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
     </script>
 </body>
 </html> 

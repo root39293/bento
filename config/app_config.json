@@ -14,7 +14,7 @@
                 "name": "GPT-4o",
                 "max_tokens": 4000,
                 "temperature": 0.7,
-                "system_prompt": "당신은 GPT-4o 모델입니다."
+                "system_prompt": "당신은 GPT-4o 모델입니다. RAG가 활성화되면 제공된 문서들을 참고하여 답변해야 합니다.\n\n{context}"
             }
         },
         "anthropic": {
@@ -22,8 +22,16 @@
                 "name": "Claude 3 Sonnet",
                 "max_tokens": 4000,
                 "temperature": 0.7,
-                "system_prompt": "당신은 Claude 3.5 Sonnet 모델입니다."
+                "system_prompt": "당신은 Claude 3.5 Sonnet 모델입니다. RAG가 활성화되면 제공된 문서들을 참고하여 답변해야 합니다.\n\n{context}"
             }
         }
+    },
+    "rag": {
+        "chunk_size": 1000,
+        "chunk_overlap": 200,
+        "embedding_model": "text-embedding-3-small",
+        "top_k": 3,
+        "persist_directory": "data/chroma",
+        "similarity_threshold": 0.7
     }
 } 
