@@ -3,7 +3,6 @@ from fastapi.responses import StreamingResponse
 from typing import Dict
 from .models import ChatRequest, ChatResponse
 from .service import ChatService
-from src.core.config import ui_config
 from anthropic import AsyncAnthropic
 from pydantic import BaseModel
 
@@ -13,11 +12,6 @@ class APIKeyRequest(BaseModel):
 
 router = APIRouter()
 chat_service = ChatService()
-
-@router.get("/config/ui")
-async def get_ui_config():
-    """UI 설정을 반환하는 엔드포인트"""
-    return ui_config.config
 
 @router.post("/chat/stream")
 async def chat_stream(request: ChatRequest):

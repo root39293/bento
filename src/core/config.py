@@ -1,7 +1,6 @@
 from functools import lru_cache
 from typing import Dict, ClassVar
 from pydantic_settings import BaseSettings
-import json
 import os
 
 class Settings(BaseSettings):
@@ -64,17 +63,6 @@ class ModelSettings(BaseSettings):
         """Anthropic 모델인지 확인"""
         return model_name in self.ANTHROPIC_MODELS
 
-class UIConfig:
-    """UI 관련 설정"""
-    def __init__(self, config_dir: str = None):
-        self.config_dir = config_dir or os.path.join(Settings().BASE_DIR, "config")
-        self.config_file = os.path.join(self.config_dir, "ui.json")
-        self.config = self._load_config()
-    
-    def _load_config(self) -> dict:
-        with open(self.config_file, 'r', encoding='utf-8') as f:
-            return json.load(f)
-
 @lru_cache()
 def get_settings() -> Settings:
     return Settings()
@@ -83,11 +71,6 @@ def get_settings() -> Settings:
 def get_model_settings() -> ModelSettings:
     return ModelSettings()
 
-@lru_cache()
-def get_ui_config() -> UIConfig:
-    return UIConfig()
-
 # 전역에서 사용할 설정 인스턴스들
 settings = get_settings()
 model_settings = get_model_settings()
-ui_config = get_ui_config()
