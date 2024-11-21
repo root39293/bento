@@ -8,7 +8,7 @@ class Message(BaseModel):
 class ChatRequest(BaseModel):
     question: str
     model: str
-    context_enabled: bool = True
+    context_enabled: bool = False
     conversation_id: Optional[str] = None
 
 class ChatResponse(BaseModel):

@@ -50,16 +50,11 @@ class ChatService:
         try:
             model_config = model_settings.get_model_config(model_name)
             
-            # 시스템 프롬프트 추가
-            system_prompt = model_config.get("system_prompt", "")
-            if system_prompt:
-                messages.insert(0, {"role": "system", "content": system_prompt})
-            
             async with self.anthropic_client.messages.stream(
                 model=model_name,
                 max_tokens=model_config["max_tokens"],
                 temperature=model_config["temperature"],
-                messages=[{"role": m["role"], "content": m["content"]} for m in messages]
+                messages=messages
             ) as stream:
                 async for text in stream.text_stream:
                     yield text
@@ -73,11 +68,6 @@ class ChatService:
 
         try:
             model_config = model_settings.get_model_config(model_name)
-            
-            # 시스템 프롬프트 추가
-            system_prompt = model_config.get("system_prompt", "")
-            if system_prompt:
-                messages.insert(0, {"role": "system", "content": system_prompt})
             
             stream = await self.openai_client.chat.completions.create(
                 model=model_name,
@@ -96,9 +86,18 @@ class ChatService:
     async def generate_response(self, request: ChatRequest) -> AsyncGenerator[str, None]:
         try:
             messages = []
+            
+            # 시스템 프롬프트 추가
+            model_config = model_settings.get_model_config(request.model)
+            system_prompt = model_config.get("system_prompt", "")
+            if system_prompt:
+                messages.append({"role": "system", "content": system_prompt})
+            
+            # 이전 컨텍스트 추가
             if request.context_enabled and request.conversation_id in self.conversations:
                 messages.extend(self.conversations[request.conversation_id])
             
+            # 현재 질문 추가
             messages.append({"role": "user", "content": request.question})
             
             # 모델에 따라 적절한 생성기 선택
@@ -115,10 +114,13 @@ class ChatService:
                 response_content += chunk
                 yield chunk
             
-            # 대화가 완료된 후 컨텍스트에 저장
             if request.context_enabled:
                 if request.conversation_id not in self.conversations:
                     self.conversations[request.conversation_id] = []
+                    if system_prompt:
+                        self.conversations[request.conversation_id].append(
+                            {"role": "system", "content": system_prompt}
+                        )
                 self.conversations[request.conversation_id].extend([
                     {"role": "user", "content": request.question},
                     {"role": "assistant", "content": response_content}

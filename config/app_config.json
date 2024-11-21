@@ -11,10 +11,10 @@
         },
         "openai": {
             "gpt-4o": {
-                "name": "GPT-4",
+                "name": "GPT-4o",
                 "max_tokens": 4000,
                 "temperature": 0.7,
-                "system_prompt": "당신은 GPT-4 모델입니다."
+                "system_prompt": "당신은 GPT-4o 모델입니다."
             }
         },
         "anthropic": {
@@ -22,7 +22,7 @@
                 "name": "Claude 3 Sonnet",
                 "max_tokens": 4000,
                 "temperature": 0.7,
-                "system_prompt": "당신은 Claude 3 Sonnet 모델입니다."
+                "system_prompt": "당신은 Claude 3.5 Sonnet 모델입니다."
             }
         }
     }
