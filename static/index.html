@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bento Chat Assistant</title>
+    <style>
+        .chat-container { margin: 20px; }
+        .message { margin: 10px 0; }
+        .user-message { color: blue; }
+        .assistant-message { color: green; }
+        .settings { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="settings">
+        <h3>API 키 설정</h3>
+        <div>
+            <label>OpenAI API Key:</label>
+            <input type="password" id="openai-key">
+            <button onclick="setApiKey('openai')">설정</button>
+        </div>
+        <div>
+            <label>Anthropic API Key:</label>
+            <input type="password" id="anthropic-key">
+            <button onclick="setApiKey('anthropic')">설정</button>
+        </div>
+        <div>
+            <label>모델 선택:</label>
+            <select id="model-select">
+                <option value="gpt-4o">GPT-4o</option>
+                <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+            </select>
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" id="context-enabled" checked>
+                컨텍스트 활성화
+            </label>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <div id="chat-messages"></div>
+        <div>
+            <textarea id="user-input" rows="3" placeholder="메시지를 입력하세요..."></textarea>
+            <button onclick="sendMessage()">전송</button>
+            <button onclick="clearChat()">대화 지우기</button>
+        </div>
+    </div>
+
+    <script>
+        let conversationId = Date.now().toString();
+
+        async function setApiKey(type) {
+            const key = document.getElementById(`${type}-key`).value;
+            try {
+                const response = await fetch('/api/v1/chat/set-api-key', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ api_type: type, api_key: key })
+                });
+                const data = await response.json();
+                alert(data.message);
+            } catch (error) {
+                alert('API 키 설정 중 오류가 발생했습니다.');
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // 사용자 메시지 표시
+            appendMessage('user', message);
+            input.value = '';
+
+            const chatMessages = document.getElementById('chat-messages');
+            const responseDiv = document.createElement('div');
+            responseDiv.className = 'message assistant-message';
+            chatMessages.appendChild(responseDiv);
+
+            try {
+                const response = await fetch('/api/v1/chat/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        question: message,
+                        model: document.getElementById('model-select').value,
+                        context_enabled: document.getElementById('context-enabled').checked,
+                        conversation_id: conversationId
+                    })
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const {value, done} = await reader.read();
+                    if (done) break;
+                    const text = decoder.decode(value);
+                    responseDiv.textContent += text;
+                }
+            } catch (error) {
+                responseDiv.textContent = '오류가 발생했습니다: ' + error.message;
+            }
+        }
+
+        function appendMessage(role, content) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+            messageDiv.textContent = `${role === 'user' ? '사용자' : '어시스턴트'}: ${content}`;
+            chatMessages.appendChild(messageDiv);
+        }
+
+        function clearChat() {
+            document.getElementById('chat-messages').innerHTML = '';
+            conversationId = Date.now().toString(); // 새로운 대화 ID 생성
+        }
+
+        // Enter 키로 메시지 전송
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html> 

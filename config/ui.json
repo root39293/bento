@@ -1,0 +1,47 @@
+{
+    "initial_message": {
+        "text": "안녕하세요! 저는 AI 어시스턴트입니다. 어떤 것이든 물어보세요.",
+        "bot_name": "Bento Assistant",
+        "bot_description": "지능형 AI 어시스턴트"
+    },
+    "chat": {
+        "placeholder": "무엇이든 물어보세요...",
+        "clear_confirm": "대화 내역을 모두 삭제하시겠습니까?",
+        "context": {
+            "enabled": true,
+            "max_turns": 5,
+            "max_tokens": 4000,
+            "toggle_button": true
+        }
+    },
+    "icons": {
+        "header_logo": "brain",
+        "bot_avatar": "robot",
+        "user_avatar": "circle-user",
+        "settings": "gear",
+        "clear": "trash-can",
+        "send": "paper-plane",
+        "clear_input": "xmark",
+        "context_on": "link",
+        "context_off": "unlink"
+    },
+    "colors": {
+        "header_logo_bg": "bg-indigo-500",
+        "send_button_bg": "bg-indigo-500",
+        "send_button_hover": "hover:bg-indigo-600"
+    },
+    "theme": {
+        "light": {
+            "background": "bg-white",
+            "text": "text-gray-900"
+        },
+        "dark": {
+            "background": "bg-gray-900",
+            "text": "text-gray-100"
+        }
+    },
+    "layout": {
+        "message_width": "max-w-3xl",
+        "sidebar_width": "w-64"
+    }
+} 
