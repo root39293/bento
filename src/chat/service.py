@@ -47,9 +47,14 @@ class ChatService:
             yield "Anthropic API 키가 설정되지 않았습니다."
             return
 
-        model_config = model_settings.get_model_config(model_name)
-        
         try:
+            model_config = model_settings.get_model_config(model_name)
+            
+            # 시스템 프롬프트 추가
+            system_prompt = model_config.get("system_prompt", "")
+            if system_prompt:
+                messages.insert(0, {"role": "system", "content": system_prompt})
+            
             async with self.anthropic_client.messages.stream(
                 model=model_name,
                 max_tokens=model_config["max_tokens"],
@@ -66,9 +71,14 @@ class ChatService:
             yield "OpenAI API 키가 설정되지 않았습니다."
             return
 
-        model_config = model_settings.get_model_config(model_name)
-        
         try:
+            model_config = model_settings.get_model_config(model_name)
+            
+            # 시스템 프롬프트 추가
+            system_prompt = model_config.get("system_prompt", "")
+            if system_prompt:
+                messages.insert(0, {"role": "system", "content": system_prompt})
+            
             stream = await self.openai_client.chat.completions.create(
                 model=model_name,
                 messages=messages,
