@@ -67,11 +67,11 @@ class DocumentStore:
         )
         
         return [
-            SearchResult(
-                content=doc,
-                metadata=metadata,
-                score=float(score)
-            )
+            {
+                "content": doc,
+                "metadata": metadata,
+                "score": float(score)
+            }
             for doc, metadata, score in zip(
                 results["documents"][0],
                 results["metadatas"][0],

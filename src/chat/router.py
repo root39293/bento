@@ -3,17 +3,16 @@ from typing import Dict
 
 from fastapi.responses import StreamingResponse
 from .models import ChatRequest, ChatResponse
-from .service import ChatService
 from anthropic import AsyncAnthropic
 from pydantic import BaseModel
 from src.core.config import settings, model_settings
+from src.core.state import chat_service
 
 class APIKeyRequest(BaseModel):
     api_type: str 
     api_key: str
 
 router = APIRouter()
-chat_service = ChatService()
 
 @router.post("/chat/stream")
 async def chat_stream(request: ChatRequest):

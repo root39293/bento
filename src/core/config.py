@@ -7,11 +7,14 @@ import json
 def load_json_config(filename: str) -> dict:
     """JSON 설정 파일 로드"""
     config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'config', filename)
+    print(f"설정 파일 경로: {config_path}")  # 디버깅용 로그
     try:
         with open(config_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            config = json.load(f)
+            print(f"설정 파일 로드 성공: {filename}")  # 디버깅용 로그
+            return config
     except Exception as e:
-        print(f"설정 파일 로드 실패 ({filename}): {str(e)}")
+        print(f"설정 파일 로드 실패 ({filename}): {str(e)}")  # 디버깅용 로그
         return {}
 
 # 설정 파일 로드
