@@ -62,10 +62,10 @@ if __name__ == '__main__':
         window = webview.create_window(
             title='Bento Chat Assistant',
             url='http://127.0.0.1:8000',
-            width=1280,
+            width=1440,
             height=900,
             resizable=True,
-            min_size=(1024, 768),
+            min_size=(1280, 768),
             text_select=True,
             x=None,
             y=None,
