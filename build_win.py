@@ -3,6 +3,7 @@ import os
 import sys
 
 static_path = os.path.abspath('static')
+config_path = os.path.abspath('config')
 
 PyInstaller.__main__.run([
     'src/desktop.py',
@@ -10,9 +11,13 @@ PyInstaller.__main__.run([
     '--onefile',
     '--windowed',
     '--add-data=static;static',
+    '--add-data=config;config',
     '--clean',
     '--noconfirm',
+    '--hidden-import=webview',
     '--hidden-import=webview.platforms.winforms',
+    '--hidden-import=clr',
+    '--hidden-import=pythonnet',
     '--hidden-import=asyncio',
     '--hidden-import=uvicorn.logging',
     '--hidden-import=uvicorn.loops',
@@ -24,5 +29,9 @@ PyInstaller.__main__.run([
     '--hidden-import=os',
     '--hidden-import=sys',
     '--hidden-import=resource',
+    '--hidden-import=tqdm',
+    '--hidden-import=tqdm.auto',
+    '--collect-all=tqdm',
+    '--collect-all=chromadb',
     '--debug=all',
 ]) 
