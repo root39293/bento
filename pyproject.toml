@@ -20,6 +20,7 @@ numpy = "^1.26.0"
 python-multipart = "^0.0.9"
 pypdf = "^4.0.1"
 docx2txt = "^0.8"
+tqdm = "^4.67.0"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "^6.0.0"
