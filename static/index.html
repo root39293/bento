@@ -1,64 +1,103 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bento Chat Assistant</title>
-    <style>
-        .chat-container { margin: 20px; }
-        .message { margin: 10px 0; }
-        .user-message { color: blue; }
-        .assistant-message { color: green; }
-        .settings { margin-bottom: 20px; }
-    </style>
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
-<body>
-    <div class="settings">
-        <h3>API 키 설정</h3>
-        <div>
-            <label>OpenAI API Key:</label>
-            <input type="password" id="openai-key">
-            <button onclick="setApiKey('openai')">설정</button>
-        </div>
-        <div>
-            <label>Anthropic API Key:</label>
-            <input type="password" id="anthropic-key">
-            <button onclick="setApiKey('anthropic')">설정</button>
-        </div>
-        <div>
-            <label>모델 선택:</label>
-            <select id="model-select">
-                <option value="gpt-4o">GPT-4o</option>
-                <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
-            </select>
-        </div>
-        <div>
-            <label>
-                <input type="checkbox" id="context-enabled">
-                컨텍스트 활성화
-            </label>
-            <label style="margin-left: 10px;">
-                <input type="checkbox" id="rag-enabled">
-                RAG 활성화
-            </label>
-        </div>
-    </div>
+<body class="bg-gray-50 h-full">
+    <div class="h-screen flex flex-col overflow-hidden">
+        <!-- 메인 컨테이너 -->
+        <div class="flex-1 container mx-auto p-4 grid grid-cols-12 gap-4 overflow-hidden">
+            <!-- 왼쪽 사이드바: 설정 패널 -->
+            <div class="col-span-3 bg-white rounded-lg shadow-lg p-4 animate__animated animate__fadeIn flex flex-col overflow-y-auto">
+                <h3 class="text-xl font-bold mb-4 text-gray-800 flex items-center">
+                    <i class="fas fa-cog mr-2"></i>API 키 설정
+                </h3>
+                <div class="space-y-4 flex-1">
+                    <div class="flex flex-col space-y-2">
+                        <label class="text-gray-700 text-sm">OpenAI API Key:</label>
+                        <div class="flex">
+                            <input type="password" id="openai-key" class="flex-1 rounded-l-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <button onclick="setApiKey('openai')" class="bg-blue-500 text-white px-3 rounded-r-lg hover:bg-blue-600 transition">
+                                <i class="fas fa-save"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col space-y-2">
+                        <label class="text-gray-700 text-sm">Anthropic API Key:</label>
+                        <div class="flex">
+                            <input type="password" id="anthropic-key" class="flex-1 rounded-l-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <button onclick="setApiKey('anthropic')" class="bg-blue-500 text-white px-3 rounded-r-lg hover:bg-blue-600 transition">
+                                <i class="fas fa-save"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col space-y-2">
+                        <label class="text-gray-700 text-sm">모델 선택:</label>
+                        <select id="model-select" class="rounded-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="gpt-4o">GPT-4o</option>
+                            <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 text-gray-700 text-sm">
+                            <input type="checkbox" id="context-enabled" class="rounded text-blue-500 focus:ring-blue-500">
+                            <span>컨텍스트 활성화</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-700 text-sm">
+                            <input type="checkbox" id="rag-enabled" class="rounded text-blue-500 focus:ring-blue-500">
+                            <span>RAG 활성화</span>
+                        </label>
+                    </div>
+                </div>
+                <!-- 문서 관리 -->
+                <div class="mt-4 pt-4 border-t">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800 flex items-center">
+                        <i class="fas fa-file-alt mr-2"></i>문서 관리
+                    </h3>
+                    <div class="space-y-2">
+                        <input type="file" id="document-upload" accept=".pdf,.docx,.txt" 
+                            class="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-500 file:text-white hover:file:bg-blue-600 file:transition">
+                        <button onclick="uploadDocument()" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
+                            <i class="fas fa-upload mr-2"></i>업로드
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-    <div class="chat-container">
-        <div id="chat-messages"></div>
-        <div>
-            <textarea id="user-input" rows="3" placeholder="메시지를 입력하세요..."></textarea>
-            <button onclick="sendMessage()">전송</button>
-            <button onclick="newChat()">새 대화</button>
-            <button onclick="clearChat()">대화 지우기</button>
-        </div>
-    </div>
-
-    <div class="document-management">
-        <h3>문서 관리</h3>
-        <div>
-            <input type="file" id="document-upload" accept=".pdf,.docx,.txt" />
-            <button onclick="uploadDocument()">문서 업로드</button>
+            <!-- 오른쪽 메인: 채팅 컨테이너 -->
+            <div class="col-span-9 bg-white rounded-lg shadow-lg p-4 animate__animated animate__fadeIn flex flex-col overflow-hidden">
+                <!-- 채팅 메시지 영역 -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto space-y-4 p-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    <!-- 메시지들이 여기에 추가됨 -->
+                </div>
+                
+                <!-- 입력 영역 -->
+                <div class="border-t pt-4 flex-shrink-0">
+                    <div class="flex space-x-2">
+                        <textarea id="user-input" rows="3" placeholder="메시지를 입력하세요..." 
+                            class="flex-1 rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"></textarea>
+                        <div class="flex flex-col space-y-2">
+                            <button onclick="sendMessage()" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">
+                                <i class="fas fa-paper-plane mr-2"></i>전송
+                            </button>
+                            <button onclick="newChat()" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition">
+                                <i class="fas fa-plus mr-2"></i>새 대화
+                            </button>
+                            <button onclick="clearChat()" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition">
+                                <i class="fas fa-trash mr-2"></i>지우기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -89,12 +128,8 @@
             appendMessage('user', message);
             input.value = '';
 
-            const chatMessages = document.getElementById('chat-messages');
-            const responseDiv = document.createElement('div');
-            responseDiv.className = 'message assistant-message';
-            chatMessages.appendChild(responseDiv);
-
             try {
+                let assistantMessage = '';
                 const response = await fetch('/api/v1/chat/stream', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -110,23 +145,94 @@
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
 
+                // 어시스턴트 메시지를 위한 단일 div 생성
+                const assistantDiv = document.createElement('div');
+                assistantDiv.className = 'animate__animated animate__fadeIn mb-2';
+                document.getElementById('chat-messages').appendChild(assistantDiv);
+
+                // 초기 메시지 구조 생성
+                updateAssistantMessage(assistantDiv, '');
+
                 while (true) {
                     const {value, done} = await reader.read();
                     if (done) break;
                     const text = decoder.decode(value);
-                    responseDiv.textContent += text;
+                    assistantMessage += text;
+                    // 기존 div 업데이트
+                    updateAssistantMessage(assistantDiv, assistantMessage);
                 }
+
             } catch (error) {
-                responseDiv.textContent = '오류가 발생했습니다: ' + error.message;
+                appendMessage('system', '오류가 발생했습니다: ' + error.message);
             }
+        }
+
+        // 어시스턴트 메시지 업데이트 함수
+        function updateAssistantMessage(messageDiv, content) {
+            const messageContent = `
+                <div class="flex items-start gap-2">
+                    <div class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-blue-500 mt-1">
+                        <span class="text-white text-xs">AI</span>
+                    </div>
+                    <div class="flex-1 max-w-[85%] -mt-1">
+                        <div class="inline-block bg-gray-50 rounded-2xl rounded-tl-md px-4 py-2 shadow-sm">
+                            <p class="text-[13px] leading-relaxed whitespace-pre-wrap break-words text-gray-700">${content}</p>
+                        </div>
+                        <div class="text-[10px] text-gray-400 mt-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            ${new Date().toLocaleTimeString('ko-KR', {hour: '2-digit', minute: '2-digit'})}
+                        </div>
+                    </div>
+                </div>`;
+            
+            messageDiv.innerHTML = messageContent;
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
 
         function appendMessage(role, content) {
             const chatMessages = document.getElementById('chat-messages');
             const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role}-message`;
-            messageDiv.textContent = `${role === 'user' ? '사용자' : '어시스턴트'}: ${content}`;
+            
+            if (role === 'system') {
+                messageDiv.className = 'animate__animated animate__fadeIn my-2';
+                messageDiv.innerHTML = `
+                    <div class="flex justify-center">
+                        <div class="bg-gray-50 text-gray-500 rounded-full px-4 py-1.5 text-[11px] shadow-sm">
+                            ${content}
+                        </div>
+                    </div>`;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                return;
+            }
+
+            const isUser = role === 'user';
+            messageDiv.className = 'animate__animated animate__fadeIn my-2 group';
+
+            const messageContent = `
+                <div class="flex items-start ${isUser ? 'justify-end' : 'justify-start'}">
+                    <div class="flex ${isUser ? 'flex-row-reverse' : 'flex-row'} items-start gap-2">
+                        <div class="flex-shrink-0 w-7 h-7 ${
+                            isUser 
+                                ? 'rounded-full bg-blue-500' 
+                                : 'rounded-md bg-blue-500'
+                        } flex items-center justify-center mt-1">${isUser 
+                                ? '<span class="text-white text-xs">나</span>' 
+                                : '<span class="text-white text-xs">AI</span>'
+                            }</div>
+                        <div class="flex flex-col ${isUser ? 'items-end' : 'items-start'} -mt-1">
+                            <div class="${
+                                isUser 
+                                    ? 'bg-blue-500 text-white rounded-2xl rounded-tr-md' 
+                                    : 'bg-gray-50 text-gray-700 rounded-2xl rounded-tl-md'
+                            } px-4 py-2 shadow-sm"><p class="text-[13px] leading-relaxed whitespace-pre-wrap break-words">${content}</p></div>
+                            <div class="text-[10px] text-gray-400 mt-1 ${isUser ? 'pr-2' : 'pl-2'} opacity-0 group-hover:opacity-100 transition-opacity">${new Date().toLocaleTimeString('ko-KR', {hour: '2-digit', minute: '2-digit'})}</div>
+                        </div>
+                    </div>
+                </div>`;
+            
+            messageDiv.innerHTML = messageContent;
             chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function newChat() {
@@ -198,4 +304,5 @@
         }
     </script>
 </body>
+</html> 
 </html> 
