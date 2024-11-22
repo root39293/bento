@@ -6,7 +6,7 @@ static_path = os.path.abspath('static')
 
 PyInstaller.__main__.run([
     'src/desktop.py',
-    '--name=Bento Assistant',
+    '--name=Bento_Assistant',
     '--onefile',
     '--windowed',
     '--add-data=static;static',
