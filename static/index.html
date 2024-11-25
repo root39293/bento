@@ -10,6 +10,166 @@
         .user-message { color: blue; }
         .assistant-message { color: green; }
         .settings { margin-bottom: 20px; }
+        .document-list {
+            margin-top: 20px;
+        }
+        
+        .document-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .document-info {
+            flex: 1;
+        }
+        
+        .document-date {
+            color: #666;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        
+        .document-preview {
+            color: #444;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .delete-btn {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+
+        .document-status {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .document-status.processing {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .document-status.completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .document-status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .document-metadata {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .category-select {
+            margin-right: 10px;
+            padding: 4px;
+        }
+
+        .document-description {
+            width: 300px;
+            padding: 4px;
+            margin-right: 10px;
+        }
+
+        .tags-container {
+            margin-top: 10px;
+        }
+
+        .tag {
+            background-color: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 5px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .tag button {
+            background: none;
+            border: none;
+            margin-left: 4px;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .tag-input {
+            padding: 2px 4px;
+            width: 100px;
+        }
+
+        .no-documents {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .no-documents.error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+
+        .chunks-container {
+            margin-top: 10px;
+            border-left: 2px solid #e9ecef;
+            margin-left: 10px;
+            padding-left: 10px;
+        }
+        
+        .chunk-item {
+            margin: 5px 0;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .chunk-header {
+            color: #666;
+            font-size: 0.8em;
+            margin-bottom: 5px;
+        }
+        
+        .toggle-chunks {
+            background-color: #e9ecef;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .toggle-chunks:hover {
+            background-color: #dee2e6;
+        }
+        
+        .chunks-hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -59,6 +219,13 @@
         <div>
             <input type="file" id="document-upload" accept=".pdf,.docx,.txt" />
             <button onclick="uploadDocument()">문서 업로드</button>
+        </div>
+        
+        <div class="document-list">
+            <h4>업로드된 문서 목록</h4>
+            <div id="document-list-container">
+                <!-- 문서 목록이 여기에 동적으로 추가됨 -->
+            </div>
         </div>
     </div>
 
@@ -186,6 +353,7 @@
                 const data = await response.json();
                 console.log('응답 데이터:', data);
                 alert(data.message);
+                await loadDocuments(); // 업로드 성공 후 목록 새로고침
             } catch (error) {
                 if (error.name === 'AbortError') {
                     console.error('업로드 시간 초과');
@@ -196,6 +364,189 @@
                 }
             }
         }
+
+        async function loadDocuments() {
+            try {
+                // API 키가 설정되어 있는지 확인
+                const openaiKey = document.getElementById('openai-key').value;
+                if (!openaiKey) {
+                    console.log('OpenAI API 키가 설정되지 않았습니다.');
+                    const container = document.getElementById('document-list-container');
+                    container.innerHTML = '<p class="no-documents">OpenAI API 키를 먼저 설정해주세요.</p>';
+                    return;
+                }
+
+                const response = await fetch('/api/v1/documents/list');
+                const documents = await response.json();
+                
+                const container = document.getElementById('document-list-container');
+                
+                if (!documents || documents.length === 0) {
+                    container.innerHTML = '<p class="no-documents">업로드된 문서가 없습니다.</p>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                documents.forEach(doc => {
+                    const docElement = createDocumentElement(doc);
+                    container.appendChild(docElement);
+                });
+            } catch (error) {
+                console.error('문서 목록 로드 중 오류:', error);
+                const container = document.getElementById('document-list-container');
+                container.innerHTML = '<p class="no-documents error">문서 목록을 불러오는데 실패했습니다.</p>';
+            }
+        }
+
+        function createDocumentElement(doc) {
+            const docElement = document.createElement('div');
+            docElement.className = 'document-item';
+            docElement.setAttribute('data-doc-id', doc.id);  // 문서 ID를 요소에 저장
+            
+            const tags = doc.metadata.tags ? doc.metadata.tags.split(',').filter(tag => tag) : [];
+            
+            docElement.innerHTML = `
+                <div class="document-info">
+                    <div class="document-header">
+                        <strong>${doc.metadata.source}</strong>
+                        <span class="document-status ${doc.metadata.status}">${doc.metadata.status}</span>
+                        <span class="document-date">${new Date(doc.metadata.timestamp).toLocaleString()}</span>
+                    </div>
+                    <div class="document-metadata">
+                        <select class="category-select" onchange="updateCategory('${doc.id}', this.value)">
+                            <option value="">카테고리 선택</option>
+                            <option value="general" ${doc.metadata.category === 'general' ? 'selected' : ''}>일반</option>
+                            <option value="technical" ${doc.metadata.category === 'technical' ? 'selected' : ''}>기술</option>
+                            <option value="business" ${doc.metadata.category === 'business' ? 'selected' : ''}>비즈니스</option>
+                        </select>
+                        <input type="text" 
+                               class="document-description" 
+                               placeholder="문서 설명 입력..."
+                               value="${doc.metadata.description || ''}"
+                               onchange="updateDescription('${doc.id}', this.value)">
+                        <div class="tags-container">
+                            ${tags.map(tag => `
+                                <span class="tag">${tag} <button onclick="removeTag('${doc.id}', '${tag}')">&times;</button></span>
+                            `).join('')}
+                            <input type="text" 
+                                   class="tag-input" 
+                                   placeholder="태그 추가..."
+                                   onkeypress="addTag('${doc.id}', event)">
+                        </div>
+                    </div>
+                    <button class="toggle-chunks" onclick="toggleChunks('${doc.id}')">
+                        청크 보기 (${doc.chunks.length}개)
+                    </button>
+                    <div id="chunks-${doc.id}" class="chunks-container chunks-hidden">
+                        ${doc.chunks.map((chunk, index) => `
+                            <div class="chunk-item">
+                                <div class="chunk-header">청크 ${index + 1}/${doc.chunks.length}</div>
+                                <div class="chunk-content">${chunk.content}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="document-actions">
+                    <button onclick="deleteDocument('${doc.id}')" class="delete-btn">삭제</button>
+                </div>
+            `;
+            return docElement;
+        }
+
+        function toggleChunks(docId) {
+            const chunksContainer = document.getElementById(`chunks-${docId}`);
+            const button = chunksContainer.previousElementSibling;
+            const isHidden = chunksContainer.classList.contains('chunks-hidden');
+            
+            chunksContainer.classList.toggle('chunks-hidden');
+            button.textContent = isHidden ? '청크 숨기기' : `청크 보기 (${chunksContainer.children.length}개)`;
+        }
+
+        async function updateCategory(docId, category) {
+            await updateDocumentMetadata(docId, { category });
+        }
+
+        async function updateDescription(docId, description) {
+            await updateDocumentMetadata(docId, { description });
+        }
+
+        async function addTag(docId, event) {
+            if (event.key === 'Enter') {
+                const tag = event.target.value.trim();
+                if (tag) {
+                    const response = await fetch(`/api/v1/documents/${docId}`, {
+                        method: 'GET'
+                    });
+                    const doc = await response.json();
+                    const currentTags = doc.metadata.tags ? doc.metadata.tags.split(',').filter(t => t) : [];
+                    const tags = [...new Set([...currentTags, tag])]; // 중복 제거
+                    await updateDocumentMetadata(docId, { tags });
+                    event.target.value = '';
+                    await loadDocuments();
+                }
+            }
+        }
+
+        async function removeTag(docId, tagToRemove) {
+            const response = await fetch(`/api/v1/documents/${docId}`, {
+                method: 'GET'
+            });
+            const doc = await response.json();
+            const currentTags = doc.metadata.tags ? doc.metadata.tags.split(',').filter(t => t) : [];
+            const tags = currentTags.filter(tag => tag !== tagToRemove);
+            await updateDocumentMetadata(docId, { tags });
+            await loadDocuments();
+        }
+
+        async function updateDocumentMetadata(docId, updates) {
+            try {
+                const response = await fetch(`/api/v1/documents/${docId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('메타데이터 업데이트 실패');
+                }
+                
+                await loadDocuments();
+            } catch (error) {
+                console.error('메타데이터 업데이트 중 오류:', error);
+                alert('메타데이터 업데이트에 실패했습니다.');
+            }
+        }
+
+        async function deleteDocument(documentId) {
+            if (!confirm('이 문서를 삭제하시겠습니까?')) return;
+            
+            try {
+                const response = await fetch(`/api/v1/documents/${documentId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // 성공적으로 삭제되면 해당 문서 요소를 UI에서 즉시 제거
+                    const docElement = document.querySelector(`[data-doc-id="${documentId}"]`);
+                    if (docElement) {
+                        docElement.remove();
+                    }
+                    
+                    // 문서 목록 새로고침
+                    await loadDocuments();
+                    alert('문서가 삭제되었습니다.');
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.detail);
+                }
+            } catch (error) {
+                console.error('문서 삭제 중 오류:', error);
+                alert('문서 삭제에 실패했습니다.');
+            }
+        }
+
+        // 페이지 로드 시 문서 목록 로드
+        document.addEventListener('DOMContentLoaded', loadDocuments);
     </script>
 </body>
 </html> 

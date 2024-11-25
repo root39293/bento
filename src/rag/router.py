@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, File, UploadFile, Depends
 from .service import RAGService
-from .models import SearchRequest, SearchResult
+from .models import SearchRequest, SearchResult, UpdateDocumentRequest
 from typing import List
 from src.core.state import chat_service
 
@@ -56,5 +56,48 @@ async def search_documents(
     try:
         results = await rag_service.search(query=request.query, top_k=request.top_k)
         return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/list", response_model=List[dict])
+async def list_documents(
+    rag_service: RAGService = Depends(get_rag_service)
+):
+    """저장된 문서 목록 조회"""
+    try:
+        documents = await rag_service.get_documents()
+        return documents
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/{document_id}")
+async def delete_document(
+    document_id: str,
+    rag_service: RAGService = Depends(get_rag_service)
+):
+    """문서 삭제"""
+    try:
+        success = await rag_service.delete_document(document_id)
+        if success:
+            return {"message": "문서가 성공적으로 삭제되었습니다"}
+        raise HTTPException(status_code=404, detail="문서를 찾을 수 없습니다")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.patch("/{document_id}")
+async def update_document_metadata(
+    document_id: str,
+    updates: UpdateDocumentRequest,
+    rag_service: RAGService = Depends(get_rag_service)
+):
+    """문서 메타데이터 업데이트"""
+    try:
+        success = await rag_service.update_document_metadata(
+            document_id,
+            updates.dict(exclude_unset=True)
+        )
+        if success:
+            return {"message": "문서 메타데이터가 업데이트되었습니다"}
+        raise HTTPException(status_code=404, detail="문서를 찾을 수 없습니다")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) 
