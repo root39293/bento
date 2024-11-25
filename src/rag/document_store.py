@@ -78,3 +78,32 @@ class DocumentStore:
                 results["distances"][0]
             )
         ] 
+
+    async def get_documents(self):
+        """저장된 모든 문서 메타데이터 조회"""
+        try:
+            if not self._collection:
+                print("컬렉션이 초기화되지 않았습니다")
+                self._collection = self.client.get_or_create_collection(
+                    name="documents",
+                    metadata={"hnsw:space": "cosine"}
+                )
+            
+            results = self._collection.get()
+            print(f"조회된 문서 수: {len(results['ids']) if results.get('ids') else 0}")
+            
+            if not results or not results.get('ids'):
+                print("저장된 문서가 없습니다")
+                return []
+            
+            documents = []
+            for i in range(len(results['ids'])):
+                documents.append({
+                    'id': results['ids'][i],
+                    'metadata': results['metadatas'][i],
+                    'content': results['documents'][i]
+                })
+            return documents
+        except Exception as e:
+            print(f"문서 조회 중 오류 발생: {str(e)}")
+            return []  # 에러 발생시 빈 리스트 반환 

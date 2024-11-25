@@ -201,3 +201,50 @@ class RAGService:
         except Exception as e:
             print(f"메타데이터 업데이트 중 오류: {str(e)}")
             raise
+
+    async def list_documents(self):
+        """저장된 문서 목록 반환"""
+        try:
+            documents = await self.document_store.get_documents()
+            
+            # 원본 문서별로 그룹화
+            documents_by_source = {}
+            for doc in documents:
+                source = doc['metadata']['source']
+                if source not in documents_by_source:
+                    documents_by_source[source] = {
+                        'source': source,
+                        'timestamp': doc['metadata']['timestamp'],
+                        'status': doc['metadata'].get('status', 'completed'),
+                        'category': doc['metadata'].get('category', ''),
+                        'description': doc['metadata'].get('description', ''),
+                        'tags': doc['metadata'].get('tags', ''),
+                        'chunks': []
+                    }
+                
+                documents_by_source[source]['chunks'].append({
+                    'id': doc['id'],
+                    'chunk_id': doc['metadata']['chunk_id'],
+                    'content': doc['content']
+                })
+            
+            # 결과 포맷팅
+            result = [
+                {
+                    'source': doc['source'],
+                    'timestamp': doc['timestamp'],
+                    'status': doc['status'],
+                    'category': doc['category'],
+                    'description': doc['description'],
+                    'tags': doc['tags'],
+                    'chunks': sorted(doc['chunks'], key=lambda x: x['chunk_id'])
+                }
+                for doc in documents_by_source.values()
+            ]
+            
+            print(f"조회된 원본 문서 수: {len(result)}")
+            return result
+            
+        except Exception as e:
+            print(f"문서 목록 조회 중 오류 발생: {str(e)}")
+            return []

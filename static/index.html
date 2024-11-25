@@ -4,226 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bento Chat Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .chat-container { margin: 20px; }
-        .message { margin: 10px 0; }
-        .user-message { color: blue; }
-        .assistant-message { color: green; }
-        .settings { margin-bottom: 20px; }
-        .document-list {
-            margin-top: 20px;
-        }
-        
-        .document-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .document-info {
-            flex: 1;
-        }
-        
-        .document-date {
-            color: #666;
-            font-size: 0.9em;
-            margin-left: 10px;
-        }
-        
-        .document-preview {
-            color: #444;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-        
-        .delete-btn {
-            background-color: #ff4444;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .delete-btn:hover {
-            background-color: #cc0000;
-        }
-
-        .document-status {
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 0.8em;
-            margin-left: 10px;
-        }
-
-        .document-status.processing {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .document-status.completed {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .document-status.error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .document-metadata {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .category-select {
-            margin-right: 10px;
-            padding: 4px;
-        }
-
-        .document-description {
-            width: 300px;
-            padding: 4px;
-            margin-right: 10px;
-        }
-
-        .tags-container {
-            margin-top: 10px;
-        }
-
-        .tag {
-            background-color: #e9ecef;
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-right: 5px;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .tag button {
-            background: none;
-            border: none;
-            margin-left: 4px;
-            cursor: pointer;
-            color: #6c757d;
-        }
-
-        .tag-input {
-            padding: 2px 4px;
-            width: 100px;
-        }
-
-        .no-documents {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-        
-        .no-documents.error {
-            color: #721c24;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-        }
-
-        .chunks-container {
-            margin-top: 10px;
-            border-left: 2px solid #e9ecef;
-            margin-left: 10px;
-            padding-left: 10px;
-        }
-        
-        .chunk-item {
-            margin: 5px 0;
-            padding: 8px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-        
-        .chunk-header {
-            color: #666;
-            font-size: 0.8em;
-            margin-bottom: 5px;
-        }
-        
-        .toggle-chunks {
-            background-color: #e9ecef;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-        
-        .toggle-chunks:hover {
-            background-color: #dee2e6;
-        }
-        
         .chunks-hidden {
             display: none;
         }
     </style>
 </head>
-<body>
-    <div class="settings">
-        <h3>API 키 설정</h3>
-        <div>
-            <label>OpenAI API Key:</label>
-            <input type="password" id="openai-key">
-            <button onclick="setApiKey('openai')">설정</button>
-        </div>
-        <div>
-            <label>Anthropic API Key:</label>
-            <input type="password" id="anthropic-key">
-            <button onclick="setApiKey('anthropic')">설정</button>
-        </div>
-        <div>
-            <label>모델 선택:</label>
-            <select id="model-select">
-                <option value="gpt-4o">GPT-4o</option>
-                <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
-            </select>
-        </div>
-        <div>
-            <label>
-                <input type="checkbox" id="context-enabled">
-                컨텍스트 활성화
-            </label>
-            <label style="margin-left: 10px;">
-                <input type="checkbox" id="rag-enabled">
-                RAG 활성화
-            </label>
-        </div>
-    </div>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex">
+        <!-- 왼쪽 사이드바 - 설정 패널 -->
+        <div class="w-72 bg-white p-4 border-r border-gray-200 overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4">설정</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">OpenAI API Key</label>
+                    <div class="flex gap-2">
+                        <input type="password" id="openai-key" class="flex-1 border rounded px-2 py-1 text-sm">
+                        <button onclick="setApiKey('openai')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">설정</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Anthropic API Key</label>
+                    <div class="flex gap-2">
+                        <input type="password" id="anthropic-key" class="flex-1 border rounded px-2 py-1 text-sm">
+                        <button onclick="setApiKey('anthropic')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">설정</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">모델 선택</label>
+                    <select id="model-select" class="w-full border rounded px-2 py-1 text-sm">
+                        <option value="gpt-4o">GPT-4o</option>
+                        <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="flex items-center text-sm">
+                        <input type="checkbox" id="context-enabled" class="mr-2">
+                        컨텍스트 활성화
+                    </label>
+                    <label class="flex items-center text-sm">
+                        <input type="checkbox" id="rag-enabled" class="mr-2">
+                        RAG 활성화
+                    </label>
+                </div>
+            </div>
 
-    <div class="chat-container">
-        <div id="chat-messages"></div>
-        <div>
-            <textarea id="user-input" rows="3" placeholder="메시지를 입력하세요..."></textarea>
-            <button onclick="sendMessage()">전송</button>
-            <button onclick="newChat()">새 대화</button>
-            <button onclick="clearChat()">대화 지우기</button>
+            <!-- 문서 업로드 섹션 -->
+            <div class="mt-8">
+                <h2 class="text-xl font-bold mb-4">문서 업로드</h2>
+                <div class="space-y-4">
+                    <div>
+                        <input type="file" id="document-upload" accept=".pdf,.docx,.txt" class="block w-full text-sm mb-2">
+                        <button onclick="uploadDocument()" class="w-full bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600">
+                            업로드
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="document-management">
-        <h3>문서 관리</h3>
-        <div>
-            <input type="file" id="document-upload" accept=".pdf,.docx,.txt" />
-            <button onclick="uploadDocument()">문서 업로드</button>
+        <!-- 중앙 채팅 영역 -->
+        <div class="flex-1 flex flex-col bg-white">
+            <div id="chat-messages" class="flex-1 p-4 overflow-auto space-y-4">
+                <!-- 채팅 메시지가 여기에 추가됨 -->
+            </div>
+            <div class="border-t p-4 bg-gray-50">
+                <textarea 
+                    id="user-input" 
+                    rows="3" 
+                    placeholder="메시지를 입력하세요..." 
+                    class="w-full border rounded p-2 mb-2"
+                ></textarea>
+                <div class="flex gap-2">
+                    <button onclick="sendMessage()" class="flex-1 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        전송
+                    </button>
+                    <button onclick="newChat()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                        새 대화
+                    </button>
+                    <button onclick="clearChat()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        지우기
+                    </button>
+                </div>
+            </div>
         </div>
-        
-        <div class="document-list">
-            <h4>업로드된 문서 목록</h4>
-            <div id="document-list-container">
+
+        <!-- 오른쪽 사이드바 - 문서 목록 -->
+        <div class="w-96 bg-white p-4 border-l border-gray-200 overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4">문서 목록</h2>
+            <div id="document-list-container" class="space-y-4">
                 <!-- 문서 목록이 여기에 동적으로 추가됨 -->
             </div>
         </div>
@@ -330,136 +200,110 @@
 
             try {
                 console.log('파일 업로드 시도:', file.name);
-                console.log('파일 타입:', file.type);
-                
-                // 타임아웃 설정을 늘린 fetch 요청
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 타임아웃
-                
                 const response = await fetch('/api/v1/documents/upload', {
                     method: 'POST',
-                    body: formData,
-                    signal: controller.signal
+                    body: formData
                 });
                 
-                clearTimeout(timeoutId);
-                console.log('응답 상태:', response.status);
-                
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('응답 데이터:', data);
+                console.log('업로드 응답:', data);
                 alert(data.message);
-                await loadDocuments(); // 업로드 성공 후 목록 새로고침
+                
+                // 업로드 성공 후 목록 새로고침
+                await loadDocuments();
+                fileInput.value = ''; // 파일 입력 초기화
             } catch (error) {
-                if (error.name === 'AbortError') {
-                    console.error('업로드 시간 초과');
-                    alert('문서 업로드 시간이 초과되었습니다. 다시 시도해주세요.');
-                } else {
-                    console.error('업로드 오류:', error);
-                    alert('문서 업로드 중 오류가 발생했습니다: ' + error.message);
-                }
+                console.error('업로드 오류:', error);
+                alert('문서 업로드 중 오류가 발생했습니다: ' + error.message);
             }
         }
 
         async function loadDocuments() {
             try {
-                // API 키가 설정되어 있는지 확인
-                const openaiKey = document.getElementById('openai-key').value;
-                if (!openaiKey) {
-                    console.log('OpenAI API 키가 설정되지 않았습니다.');
-                    const container = document.getElementById('document-list-container');
-                    container.innerHTML = '<p class="no-documents">OpenAI API 키를 먼저 설정해주세요.</p>';
-                    return;
-                }
-
                 const response = await fetch('/api/v1/documents/list');
-                const documents = await response.json();
+                const data = await response.json();
                 
-                const container = document.getElementById('document-list-container');
+                const documentList = document.getElementById('document-list-container');
+                documentList.innerHTML = '';
                 
-                if (!documents || documents.length === 0) {
-                    container.innerHTML = '<p class="no-documents">업로드된 문서가 없습니다.</p>';
+                if (!data.documents || data.documents.length === 0) {
+                    documentList.innerHTML = '<p class="text-gray-500">업로드된 문서가 없습니다.</p>';
                     return;
                 }
                 
-                container.innerHTML = '';
-                documents.forEach(doc => {
-                    const docElement = createDocumentElement(doc);
-                    container.appendChild(docElement);
+                data.documents.forEach(doc => {
+                    const docElement = document.createElement('div');
+                    docElement.className = 'border p-4 rounded';
+                    docElement.innerHTML = `
+                        <h3 class="font-bold">${doc.source}</h3>
+                        <div class="mt-2 space-y-1">
+                            <p>업로드 시간: ${new Date(doc.timestamp).toLocaleString()}</p>
+                            <p>상태: ${doc.status}</p>
+                            ${doc.category ? `<p>카테고리: ${doc.category}</p>` : ''}
+                            ${doc.description ? `<p>설명: ${doc.description}</p>` : ''}
+                            ${doc.tags ? `<p>태그: ${doc.tags}</p>` : ''}
+                            <p>청크 수: ${doc.chunks.length}</p>
+                        </div>
+                        <div class="mt-2 space-x-2">
+                            <button onclick="toggleChunks('${encodeURIComponent(doc.source)}')" class="bg-gray-500 text-white px-2 py-1 rounded">
+                                청크 보기 (${doc.chunks.length}개)
+                            </button>
+                            <button onclick="deleteDocument('${doc.chunks[0].id}')" class="bg-red-500 text-white px-2 py-1 rounded">
+                                삭제
+                            </button>
+                        </div>
+                        <div id="chunks-${encodeURIComponent(doc.source)}" class="mt-2 pl-4 border-l chunks-hidden">
+                            ${doc.chunks.map(chunk => `
+                                <div class="mt-2 p-2 bg-gray-50">
+                                    <div class="text-sm text-gray-500">청크 ID: ${chunk.chunk_id}</div>
+                                    <div class="mt-1">${chunk.content}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    documentList.appendChild(docElement);
                 });
+                
+                console.log('문서 목록 로드 완료:', data.documents.length);
             } catch (error) {
                 console.error('문서 목록 로드 중 오류:', error);
-                const container = document.getElementById('document-list-container');
-                container.innerHTML = '<p class="no-documents error">문서 목록을 불러오는데 실패했습니다.</p>';
+                const documentList = document.getElementById('document-list-container');
+                documentList.innerHTML = '<p class="text-red-500">문서 목록을 불러오는 중 오류가 발생했습니다.</p>';
             }
         }
 
-        function createDocumentElement(doc) {
-            const docElement = document.createElement('div');
-            docElement.className = 'document-item';
-            docElement.setAttribute('data-doc-id', doc.id);  // 문서 ID를 요소에 저장
-            
-            const tags = doc.metadata.tags ? doc.metadata.tags.split(',').filter(tag => tag) : [];
-            
-            docElement.innerHTML = `
-                <div class="document-info">
-                    <div class="document-header">
-                        <strong>${doc.metadata.source}</strong>
-                        <span class="document-status ${doc.metadata.status}">${doc.metadata.status}</span>
-                        <span class="document-date">${new Date(doc.metadata.timestamp).toLocaleString()}</span>
-                    </div>
-                    <div class="document-metadata">
-                        <select class="category-select" onchange="updateCategory('${doc.id}', this.value)">
-                            <option value="">카테고리 선택</option>
-                            <option value="general" ${doc.metadata.category === 'general' ? 'selected' : ''}>일반</option>
-                            <option value="technical" ${doc.metadata.category === 'technical' ? 'selected' : ''}>기술</option>
-                            <option value="business" ${doc.metadata.category === 'business' ? 'selected' : ''}>비즈니스</option>
-                        </select>
-                        <input type="text" 
-                               class="document-description" 
-                               placeholder="문서 설명 입력..."
-                               value="${doc.metadata.description || ''}"
-                               onchange="updateDescription('${doc.id}', this.value)">
-                        <div class="tags-container">
-                            ${tags.map(tag => `
-                                <span class="tag">${tag} <button onclick="removeTag('${doc.id}', '${tag}')">&times;</button></span>
-                            `).join('')}
-                            <input type="text" 
-                                   class="tag-input" 
-                                   placeholder="태그 추가..."
-                                   onkeypress="addTag('${doc.id}', event)">
-                        </div>
-                    </div>
-                    <button class="toggle-chunks" onclick="toggleChunks('${doc.id}')">
-                        청크 보기 (${doc.chunks.length}개)
-                    </button>
-                    <div id="chunks-${doc.id}" class="chunks-container chunks-hidden">
-                        ${doc.chunks.map((chunk, index) => `
-                            <div class="chunk-item">
-                                <div class="chunk-header">청크 ${index + 1}/${doc.chunks.length}</div>
-                                <div class="chunk-content">${chunk.content}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-                <div class="document-actions">
-                    <button onclick="deleteDocument('${doc.id}')" class="delete-btn">삭제</button>
-                </div>
-            `;
-            return docElement;
-        }
+        // 페이지 로드 시 문서 목록 로드
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('페이지 로드됨, 문서 목록 로드 시작');
+            loadDocuments();
+        });
 
         function toggleChunks(docId) {
             const chunksContainer = document.getElementById(`chunks-${docId}`);
-            const button = chunksContainer.previousElementSibling;
+            if (!chunksContainer) {
+                console.error(`청크 컨테이너를 찾을 수 없습니다: chunks-${docId}`);
+                return;
+            }
+            
+            // 버튼 찾기 (부모 div에서 청크 보기 버튼 찾기)
+            const button = document.querySelector(`button[onclick="toggleChunks('${docId}')"]`);
+            if (!button) {
+                console.error('토글 버튼을 찾을 수 없습니다');
+                return;
+            }
+
             const isHidden = chunksContainer.classList.contains('chunks-hidden');
             
+            // 클래스 토글
             chunksContainer.classList.toggle('chunks-hidden');
-            button.textContent = isHidden ? '청크 숨기기' : `청크 보기 (${chunksContainer.children.length}개)`;
+            
+            // 버튼 텍스트 업데이트
+            const chunkCount = chunksContainer.querySelectorAll('.mt-2.p-2.bg-gray-50').length;
+            button.textContent = isHidden ? '청크 숨기기' : `청크 보기 (${chunkCount}개)`;
         }
 
         async function updateCategory(docId, category) {
@@ -526,27 +370,16 @@
                 });
                 
                 if (response.ok) {
-                    // 성공적으로 삭제되면 해당 문서 요소를 UI에서 즉시 제거
-                    const docElement = document.querySelector(`[data-doc-id="${documentId}"]`);
-                    if (docElement) {
-                        docElement.remove();
-                    }
-                    
-                    // 문서 목록 새로고침
-                    await loadDocuments();
-                    alert('문서가 삭제되었습니다.');
+                    await loadDocuments(); // 목록 새로고침
                 } else {
                     const error = await response.json();
-                    throw new Error(error.detail);
+                    alert(`삭제 실패: ${error.detail}`);
                 }
             } catch (error) {
                 console.error('문서 삭제 중 오류:', error);
-                alert('문서 삭제에 실패했습니다.');
+                alert('문서 삭제 중 오류가 발생했습니다.');
             }
         }
-
-        // 페이지 로드 시 문서 목록 로드
-        document.addEventListener('DOMContentLoaded', loadDocuments);
     </script>
 </body>
 </html> 
