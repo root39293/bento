@@ -43,7 +43,7 @@ FastAPI 기반의 로컬 실행 가능한 AI 챗봇 스타터킷입니다. OpenA
 
 1. 저장소 클론
 ~~~bash
-git clone https://github.com/yourusername/bento-chat-assistant.git
+git clone https://github.com/root39293/bento-chat-assistant.git
 cd bento-chat-assistant
 ~~~
 
