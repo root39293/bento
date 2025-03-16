@@ -1,4 +1,4 @@
-# Bento Chat Assistant
+# Bento
 
 FastAPI 기반의 로컬 실행 가능한 AI 챗봇 스타터킷입니다. OpenAI와 Anthropic의 AI 모델을 활용하여 대화형 인터페이스를 제공하며, RAG(Retrieval-Augmented Generation) 기능을 통해 사용자의 문서를 참조한 응답이 가능합니다.
 
@@ -43,8 +43,8 @@ FastAPI 기반의 로컬 실행 가능한 AI 챗봇 스타터킷입니다. OpenA
 
 1. 저장소 클론
 ~~~bash
-git clone https://github.com/root39293/bento-chat-assistant.git
-cd bento-chat-assistant
+git clone https://github.com/root39293/bento.git
+cd bento
 ~~~
 
 2. Poetry 설치 (미설치 시)
